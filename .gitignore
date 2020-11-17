@@ -1,5 +1,13 @@
 node_modules
 .env
 
+features/evidencia
+features/favorite
+features/generic2
+features/metadata
+features/team
+features/upload
+
 api.code-workspace
 .favorites.json
+versions-packages

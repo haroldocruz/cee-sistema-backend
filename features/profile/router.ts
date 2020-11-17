@@ -1,10 +1,11 @@
 import express, { NextFunction, Request, Response, Router} from 'express';
 import Auth, { IAuth } from '../../authServices';
-import controller, { IInstrumentCtrl } from './controller';
-import { IInstrument } from './IInstrument';
+import { IInstrumentCtrl } from './controller';
 
 var router = express.Router();
 
+import controller from './controller';
+import { IInstrument } from '../instrument/IInstrument';
 // var metadata = require('../metadata/metadataCtrl')
 
 // module.exports = function (itemName: string, obj: Object) {

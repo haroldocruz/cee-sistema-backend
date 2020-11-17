@@ -15,9 +15,9 @@
 // }
 
 
-import { Model } from "mongoose";
-import DB from "../../db/dbConnect";
 import { IInstrument, Instrument } from "./IInstrument";
+import DB from "../../db/dbConnect";
+import { Model } from "mongoose";
 
 // export default function (itemName: string): Model<Document, {}> {
 export default function (itemName: string): Model<IInstrument> {
