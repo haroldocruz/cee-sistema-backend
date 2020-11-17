@@ -3,3 +3,4 @@ node_modules
 
 api.code-workspace
 .favorites.json
+versions-packages
