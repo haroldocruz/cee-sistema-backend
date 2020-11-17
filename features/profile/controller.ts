@@ -1,9 +1,9 @@
 import { Model } from 'mongoose';
 import { Request } from "express";
 import { IInstrument } from './IInstrument';
-import item from "./model";
 import { IAuth } from "../../authServices";
 import * as MSG from "../../utils/messages";
+import item from "./model";
 // var metadata = require('../metadata/metadataCtrl')
 
 export interface IInstrumentCtrl {
@@ -19,6 +19,7 @@ export interface IInstrumentCtrl {
 
 export default function (itemName: string) {
 
+    // var ItemModel = require('./model')(itemName);
     const ItemModel = item(itemName);
 
     return {

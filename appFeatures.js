@@ -1,10 +1,17 @@
-
 module.exports = function (app) {
+
+  const User = require("./models/User")
+  const Profile = require("./models/Profile")
+  const Instrument = require("./models/Instrument")
+
+  app.use('/user', require('./features/generic')("user", User.User));
+  app.use('/instrument', require('./features/generic')("instrument", Instrument.Instrument));
+  app.use('/profile', require('./features/generic')("profile", Profile.Profile));
 
   app.use('/', require('./routes/index'));
   // app.use('/g', require('./features/generic/g'));
 
-  app.use('/instrument', require('./features/instrument'));
+  // app.use('/instrument', require('./features/instrument'));
 
   // app.use('/meta', require('./features/meta'));
   // app.use('/equipe', require('./features/equipe'));

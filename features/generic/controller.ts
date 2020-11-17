@@ -1,13 +1,12 @@
 import { Model, Document } from "mongoose";
 import { Request } from "express";
-import { IUser } from './../../models/User';
 import item from "./model";
 import * as MSG from '../../utils/messages';
 import Auth, { IAuth } from "../../authServices";
 const util = require('../../utils/util');
 // var metadata = require('../metadata/metadataCtrl')
 
-export interface IUserCtrl {
+export interface DocumentCtrl {
     'login': (arg0: Request & IAuth, callback: any) => any;
     // 'changeProfile': (arg0: Request & IAuth, callback: any) => any;
     'getOne': (arg0: Request & IAuth, callback: any) => any;
@@ -19,13 +18,11 @@ export interface IUserCtrl {
     'counter': (arg0: Request & IAuth, callback: any) => any;
 }
 
-export default function (itemName: string) {
+export default function (itemName: string, obj: {}) {
 
-    const ItemModel = item(itemName);
+    const ItemModel = item(itemName, obj);
 
     return {
-        'login': fnLogin(ItemModel),
-        // 'changeProfile': fnChangeProfile(ItemModel),
         'getOne': getOne(ItemModel),
         'getAll': getAll(ItemModel),
         'save': save(ItemModel),
@@ -40,23 +37,23 @@ function isValidAccessLevel(accessLevel: string, list: Array<string>) {
     return list.includes(accessLevel);
 }
 
-// function fnChangeProfile(User: Model<IUser>) {
+// function fnChangeProfile(User: Model<Document>) {
 //     return []
 // }
 
 
-function getOne(ItemModel: Model<IUser>) {
+function getOne(ItemModel: Model<Document>) {
     return (req: Request & IAuth, callback: Function) => {
-        console.log("\tUSER_READ_ONE\n")
+        console.log("\tGENERIC_READ_ONE\n")
 
         ItemModel.findOne({ '_id': req.params.id }, (error: any, data: any) => { (error || !data) ? callback(MSG.errFind) : callback(data) })
         // .populate({ path: '_indicator', populate: { path: '_critery' } })
     }
 }
 
-function getAll(ItemModel: Model<IUser>) {
+function getAll(ItemModel: Model<Document>) {
     return (req: Request & IAuth, callback: Function) => {
-        console.log("\tUSER_READ_ALL\n")
+        console.log("\tGENERIC_READ_ALL\n")
 
         ItemModel.find({}, (error: any, resp: any) => { (error || !resp) ? callback(MSG.errFind) : callback(resp) })
             // .populate({ path: '_indicator', populate: { path: '_critery' } })
@@ -67,7 +64,7 @@ function getAll(ItemModel: Model<IUser>) {
 
 function save(ItemModel: any) {
     return async (req: any, callback: Function) => {
-        console.log("\tUSER_CREATE\n")
+        console.log("\tGENERIC_CREATE\n")
 
         var newItem = new ItemModel(req.body);
         await newItem.save(function (error: any) { (error) ? callback(MSG.errSave) : callback(MSG.msgSuccess) });
@@ -77,8 +74,8 @@ function save(ItemModel: any) {
 
 function update(ItemModel: Model<Document>) {
     return async (req: Request & IAuth, callback: Function) => {
-        console.log("\tUSER_UPDATE\n")
-
+        console.log("\tGENERIC_UPDATE\n")
+        
         const id = req.body._id || req.params.id;
         await ItemModel.updateOne({ '_id': id }, req.body, (error: any, data: any) => {
             console.log(data);
@@ -92,62 +89,11 @@ function update(ItemModel: Model<Document>) {
 
 function remove(ItemModel: any) {
     return async (req: Request & IAuth, callback: Function) => {
-        console.log("\tUSER_DELETE\n")
+        console.log("\tGENERIC_DELETE\n")
 
         await ItemModel.deleteOne({ '_id': req.params.id }, function (error: any) {
             (error) ? callback(MSG.errRem) : callback(MSG.msgSuccess);
         });
-    }
-}
-
-function fnLogin(User: Model<Document>) {
-    return async (req: Request & IAuth, callback: Function) => {
-        console.log("\tUSER_LOGIN");
-
-        const user = await User.findOne({ 'cpf': req.body.cpf }).select('+password');
-        autentication(req.body, <IUser>user, callback)
-    }
-
-    async function autentication(reqData: IUser, user: IUser, callback: Function) {
-        if (!user)
-            callback(MSG.errUserAbsent)
-        else {
-            //se a senha estiver correta
-            if (Auth.decodePassword(reqData.dataAccess.password, user.dataAccess.passwordHash)) {
-                // if (reqData.password == user.dataAccess.password) {
-                //gerar um token para a conexao
-                // user.loginInfo.token = Auth.generateToken(user.email);
-                user.loginInfo.token = await Auth.generateToken({
-                    'date': Date.now(),
-                    '_id': user._id,
-                    'profile': Auth.generateToken(user.profiles ?? 'Registrado')
-                });
-                userLoginInfoUpdate(user, callback);
-            }
-            else {
-                callback(MSG.errPass);
-            }
-        }
-    }
-
-    function userLoginInfoUpdate(user: any, callback: Function) {
-        //salva/atualiza o token no usuario db
-        // Item.findOneAndUpdate({ '_id': user._id }, user, { upsert: true }, (error) => {
-        //     (error) ? callback(MSG.errLogin) : callback(user.loginInfo.token);
-        // });
-
-        const query = User.updateOne({ '_id': user._id }, user);
-        callback(query) //! trocar
-        // User.updateOne({ '_id': user._id }, user, (error) => {
-        //     if (error) {
-        //         console.log("USER_LOGIN_ERROR: " + error);
-        //         callback(MSG.errLogin);
-        //     }
-        //     else {
-        //         delete user.password;
-        //         callback(user);
-        //     }
-        // });
     }
 }
 
