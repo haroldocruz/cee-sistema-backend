@@ -15,7 +15,7 @@
 // }
 
 
-import { IInstrument, Instrument } from "./IInstrument";
+import { IInstrument, Instrument } from "./../instrument/IInstrument";
 import DB from "../../db/dbConnect";
 import { Model } from "mongoose";
 

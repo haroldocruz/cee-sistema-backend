@@ -77,7 +77,7 @@ function update(ItemModel: Model<Document>) {
         console.log("\tGENERIC_UPDATE\n")
         
         const id = req.body._id || req.params.id;
-        await ItemModel.updateOne({ '_id': id }, req.body, (error: any, data: any) => {
+        await ItemModel.updateOne({ '_id': id }, req.body, {}, (error: any, data: any) => {
             console.log(data);
             (error) ? callback(MSG.errUpd) : (data.nModified) ? callback(MSG.msgSuccess) : callback(MSG.errUpd)
         });

@@ -1,0 +1,6 @@
+.git
+.favorites.json
+api.code-workspace
+node_modules
+rest-client
+versions-packages

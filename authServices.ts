@@ -50,7 +50,7 @@ export default {
  * @returns Retorna uma string codificada
  */
 async function encodePassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(<number|undefined>process.env.SALT_ROUNDS);
+    const salt = await bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS));
     const hash = await bcrypt.hash(password, salt);
     return hash;
 }

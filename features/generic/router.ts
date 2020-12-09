@@ -5,7 +5,7 @@ import controller from './controller';
 
 var router = express.Router();
 
-var metadata = require('../metadata/metadataCtrl')
+// var metadata = require('../metadata/metadataCtrl')
 
 // module.exports = function (itemName, obj) {
 export default function (itemName: string, obj: {}) {

@@ -75,12 +75,12 @@ function save(ItemModel: any) {
     }
 }
 
-function update(ItemModel: Model<Document>) {
+function update(ItemModel: Model<IUser>) {
     return async (req: Request & IAuth, callback: Function) => {
         console.log("\tUSER_UPDATE\n")
 
         const id = req.body._id || req.params.id;
-        await ItemModel.updateOne({ '_id': id }, req.body, (error: any, data: any) => {
+        await ItemModel.updateOne({ '_id': id }, req.body, {}, (error: any, data: any) => {
             console.log(data);
             (error) ? callback(MSG.errUpd) : (data.nModified) ? callback(MSG.msgSuccess) : callback(MSG.errUpd)
         });
@@ -100,7 +100,7 @@ function remove(ItemModel: any) {
     }
 }
 
-function fnLogin(User: Model<Document>) {
+function fnLogin(User: Model<IUser>) {
     return async (req: Request & IAuth, callback: Function) => {
         console.log("\tUSER_LOGIN");
 
@@ -151,7 +151,7 @@ function fnLogin(User: Model<Document>) {
     }
 }
 
-function fnCounter(User: Model<Document>) {
+function fnCounter(User: Model<IUser>) {
     return (req: Request & IAuth, callback: Function) => {
         User.countDocuments(req.body).exec((error, data) => {
             (error || !data) ? callback(MSG.errConn) : callback(data)

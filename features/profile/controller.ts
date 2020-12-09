@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { Request } from "express";
-import { IInstrument } from './IInstrument';
+import { IInstrument } from './../instrument/IInstrument';
 import { IAuth } from "../../authServices";
 import * as MSG from "../../utils/messages";
 import item from "./model";

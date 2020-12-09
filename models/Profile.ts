@@ -2,7 +2,6 @@ import { Document, Schema } from 'mongoose';
 import { ModelNameEnum } from './enumerations/ModelNameEnum';
 
 export interface IProfile extends Document {
-    "id"?: string;
     "status": boolean;
     "name": string;
     "roleCrud"?: IRoleCrud[];

@@ -93,7 +93,7 @@ export interface IUserBase {
 }
 
 export interface IUser extends IUserBase, Document { }
-export interface IUser2 extends Model<Document, IUserBase> { }
+export interface IUser2 extends Model<Document> { }
 
 export const User = {
     'status': { type: Boolean, default: false },
