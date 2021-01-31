@@ -6,7 +6,7 @@ import * as MSG from "../../utils/messages";
 import item from "./model";
 // var metadata = require('../metadata/metadataCtrl')
 
-export interface IInstrumentCtrl {
+export interface IProfileCtrl {
     'getOne': (arg0: Request & IAuth, callback: any) => any;
     'getAll': (arg0: Request & IAuth, callback: any) => any;
     'save': (arg0: Request & IAuth, callback: any) => any;

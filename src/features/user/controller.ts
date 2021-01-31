@@ -1,4 +1,5 @@
 import { Model, Document } from "mongoose";
+import { DeleteWriteOpResultObject } from "mongodb";
 import { Request } from "express";
 import { IUser } from './../../models/User';
 import item from "./model";
@@ -94,8 +95,8 @@ function remove(ItemModel: any) {
     return async (req: Request & IAuth, callback: Function) => {
         console.log("\tUSER_DELETE\n")
 
-        await ItemModel.deleteOne({ '_id': req.params.id }, function (error: any) {
-            (error) ? callback(MSG.errRem) : callback(MSG.msgSuccess);
+        await ItemModel.deleteOne({ '_id': req.params.id }, function (error: any, data: DeleteWriteOpResultObject) {
+            (error) ? callback(MSG.errRem) : (data.deletedCount == 0) ? callback(MSG.errRemNotFound) : callback(MSG.msgSuccess);
         });
     }
 }
@@ -113,7 +114,7 @@ function fnLogin(User: Model<IUser>) {
             callback(MSG.errUserAbsent)
         else {
             //se a senha estiver correta
-            if (Auth.decodePassword(reqData.dataAccess.password, user.dataAccess.passwordHash)) {
+            if (Auth.decodePassword(reqData.dataAccess.password, user.dataAccess.password)) {
                 // if (reqData.password == user.dataAccess.password) {
                 //gerar um token para a conexao
                 // user.loginInfo.token = Auth.generateToken(user.email);
@@ -137,17 +138,17 @@ function fnLogin(User: Model<IUser>) {
         // });
 
         const query = User.updateOne({ '_id': user._id }, user);
-        callback(query) //! trocar
-        // User.updateOne({ '_id': user._id }, user, (error) => {
-        //     if (error) {
-        //         console.log("USER_LOGIN_ERROR: " + error);
-        //         callback(MSG.errLogin);
-        //     }
-        //     else {
-        //         delete user.password;
-        //         callback(user);
-        //     }
-        // });
+        // callback(query) //! trocar
+        User.updateOne({ '_id': user._id }, user, (error) => {
+            if (error) {
+                console.log("USER_LOGIN_ERROR: " + error);
+                callback(MSG.errLogin);
+            }
+            else {
+                delete user.password;
+                callback(user);
+            }
+        });
     }
 }
 

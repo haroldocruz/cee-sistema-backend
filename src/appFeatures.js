@@ -1,10 +1,10 @@
 module.exports = function (app) {
 
-  const User = require("./models/User")
+  // const User = require("./models/User")
   const Profile = require("./models/Profile")
   const Instrument = require("./models/Instrument")
 
-  app.use('/user', require('./features/generic')("user", User.User));
+  // app.use('/user', require('./features/generic')("user", User.User));
   app.use('/instrument', require('./features/generic')("instrument", Instrument.Instrument));
   app.use('/profile', require('./features/generic')("profile", Profile.Profile));
 
@@ -22,7 +22,9 @@ module.exports = function (app) {
   // app.use('/estrategia', require('./features/estrategia'));
   // app.use('/acao', require('./features/acao'));
   
-  // app.use('/user', require('./features/user'));
+  app.use('/user', require('./features/user'));
+  app.use('/send-mail', require('./features/send-mail'));
+  app.use('/send-sms', require('./features/send-sms'));
   // app.use('/accessLevel', require('./features/accessLevel'));
   // app.use('/upload', require('./features/upload'));
 

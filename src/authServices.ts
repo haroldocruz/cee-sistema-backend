@@ -10,6 +10,9 @@ dotenv.config();
 const jwt = require('jsonwebtoken');
 const bcryptNodejs = require('bcrypt-nodejs');
 
+import { model } from "mongoose";
+
+import { IProfileCtrl } from './features/profile/controller';
 import * as MSG from "./utils/messages";
 
 // 2^rounds iterations of processing.
@@ -104,16 +107,16 @@ function isPermitted(required: Array<string>) {
 }
 
 function isAuthorized(req: Request & IAuth, res: Response, next: NextFunction): void {
-    const token = req.body.token || req.params.token || req.headers['Authorization'] || req.headers['x-access-token'];
+    const token = req.body.token || req.query.token || req.params.token || req.headers['authorization'] || req.headers['x-access-token'];
+
     if (!token || token == undefined || token == "") {
-        // res.status(401).send(MSG.errNoToken);
-        res.send(MSG.errNoToken);
+        res.status(401).send(MSG.errNoToken);
+        // res.send(MSG.errNoToken);
     } else {
         jwt.verify(token, process.env.SALT_KEY, function (error: any, decoded: any) {
             if (error) {
                 console.log("TOKEN_ERROR: " + error)
-                // res.status(401).send(MSG.errToken);
-                res.send(MSG.errToken);
+                res.status(400).send(MSG.errToken);
             } else {
                 console.log("UserId: " + JSON.stringify(decoded._id))
                 req.userId = decoded._id;
@@ -123,3 +126,35 @@ function isAuthorized(req: Request & IAuth, res: Response, next: NextFunction): 
         });
     }
 }
+
+
+/**
+ * @description Middleware usado para dar permissão de acesso a certo recurso
+ * @param required Array com regras
+ * @param informed regra a ser verificada
+ */
+function isAllow(required: Array<string>, informed: string) {
+    interface IToken {
+        _id: string;
+        date: Date;
+        profile: string;
+    }
+    
+    const _middleware = function _middleware(req: Request & IAuth, res: Response, next: NextFunction): void {
+
+        const profile = req.tokenDecoded.profile;
+
+        required.includes(informed) ? next() : res.status(403).json([false, 'Permission denied'])
+    }
+
+    //Conditionally skip a middleware when a condition is met.
+    _middleware.unless = require('express-unless');
+
+    return _middleware;
+}
+
+
+// function getGroupList() {
+//     let ProfileModel:IProfileCtrl = model('profile');
+//     ProfileModel.getAll
+// }

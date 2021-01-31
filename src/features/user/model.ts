@@ -23,7 +23,7 @@
 
 import { Model } from "mongoose";
 import DB from "../../db/dbConnect";
-import { IUser, User } from "../../models/User";
+import { IUser, User } from "./../../models/User";
 
 export default function (itemName: string): Model<IUser> {
     const itemSchema = new DB.Schema(User, { collection: itemName });

@@ -21,6 +21,7 @@ export const errFind = [false, 'Nenhum dado encontrado'];
 export const errUpd = [false, 'Erro ao tentar atualizar'];
 //DELETE
 export const errRem = [false, 'Erro ao tentar remover'];
+export const errRemNotFound = [false, 'Erro ao tentar remover. Dado não localizado'];
 //OTHERS
 export const errNoData = [false, 'Nenhum dado enviado'];
 export const errNoPermission = [false, 'Usuário não autorizado a realizar esta operação'];
