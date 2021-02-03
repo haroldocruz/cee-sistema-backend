@@ -23,6 +23,7 @@ module.exports = function (app) {
   // app.use('/acao', require('./features/acao'));
   
   app.use('/user', require('./features/user'));
+  app.use('/auth', require('./features/auth'));
   app.use('/send-mail', require('./features/send-mail'));
   app.use('/send-sms', require('./features/send-sms'));
   // app.use('/accessLevel', require('./features/accessLevel'));
