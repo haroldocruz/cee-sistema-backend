@@ -81,11 +81,11 @@ export interface IUserBase {
     };
     'birthDate': string;
     'address': Schema.Types.ObjectId;
-    'loginInfo': {
-        'lastLoginDate': Date;
-        'token': string;
-        'providerId': string;
-        'providerKey': string;
+    'loginInfo'?: {
+        'lastLoginDate'?: Date;
+        'token'?: string;
+        'providerId'?: string;
+        'providerKey'?: string;
     }
     'metadata': Schema.Types.ObjectId;
     'email': string;

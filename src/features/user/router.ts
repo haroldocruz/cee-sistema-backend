@@ -1,22 +1,17 @@
 import express, { NextFunction, Request, Response } from 'express';
-import { model } from 'mongoose';
 import Auth, { IAuth } from '../../authServices';
 import { IUser } from './../../models/User';
 import controller, { IUserCtrl } from './controller';
 
 var router = express.Router();
 
-// var metadata = require('../metadata/metadataCtrl')
-
-// module.exports = function (itemName, obj) {
 export default function (itemName: string) {
     var itemCtrl = controller(itemName);
 
-    // model('group').find({"role": {$in: []}})
+    //const model('group').find({"role": {$in: []}})
 
     const ALLOWS = ['SuperUser', 'Administrador', 'Técnicos']
 
-    router.post('/login', fnLogin(itemCtrl));
     // router.get('/', fnGetAll(itemCtrl));
     // router.get('/:id', fnGetOne(itemCtrl));
     // router.post('/', fnSave(itemCtrl));
@@ -24,21 +19,15 @@ export default function (itemName: string) {
     // router.delete('/:id', fnRemove(itemCtrl));
     // router.post('/filter/', fnAllFilter(itemCtrl));
     // router.post('/counter/', fnCounter(itemCtrl));
-    router.get('/', Auth.isAuthorized, fnGetAll(itemCtrl));
-    router.get('/:id', Auth.isAuthorized, fnGetOne(itemCtrl));
-    router.post('/', Auth.isAuthorized, fnSave(itemCtrl));
-    router.put('/:id', Auth.isAuthorized, fnUpdate(itemCtrl));
-    router.delete('/:id', Auth.isAuthorized, fnRemove(itemCtrl));
-    router.post('/filter/', Auth.isAuthorized, fnAllFilter(itemCtrl));
-    router.post('/counter/', Auth.isAuthorized, fnCounter(itemCtrl));
+    router.get('/', Auth.isAuthorized, Auth.guard(), fnGetAll(itemCtrl));
+    router.get('/:id', Auth.isAuthorized, Auth.guard(), fnGetOne(itemCtrl));
+    router.post('/', Auth.isAuthorized, Auth.guard(), fnSave(itemCtrl));
+    router.put('/:id', Auth.isAuthorized, Auth.guard(), fnUpdate(itemCtrl));
+    router.delete('/:id', Auth.isAuthorized, Auth.guard(), fnRemove(itemCtrl));
+    router.post('/filter/', Auth.isAuthorized, Auth.guard(), fnAllFilter(itemCtrl));
+    router.post('/counter/', Auth.isAuthorized, Auth.guard(), fnCounter(itemCtrl));
 
     return router;
-}
-
-function fnLogin(itemCtrl: IUserCtrl) {
-    return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.login(req, (resp: IUser) => { res.json(resp) });
-    };
 }
 
 function fnGetOne(itemCtrl: IUserCtrl) {

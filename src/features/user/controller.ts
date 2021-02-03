@@ -4,12 +4,11 @@ import { Request } from "express";
 import { IUser } from './../../models/User';
 import item from "./model";
 import * as MSG from '../../utils/messages';
-import Auth, { IAuth } from "../../authServices";
+import { IAuth } from "../../authServices";
 const util = require('../../utils/util');
 // var metadata = require('../metadata/metadataCtrl')
 
 export interface IUserCtrl {
-    'login': (arg0: Request & IAuth, callback: any) => any;
     // 'changeProfile': (arg0: Request & IAuth, callback: any) => any;
     'getOne': (arg0: Request & IAuth, callback: any) => any;
     'getAll': (arg0: Request & IAuth, callback: any) => any;
@@ -25,7 +24,6 @@ export default function (itemName: string) {
     const ItemModel = item(itemName);
 
     return {
-        'login': fnLogin(ItemModel),
         // 'changeProfile': fnChangeProfile(ItemModel),
         'getOne': getOne(ItemModel),
         'getAll': getAll(ItemModel),
@@ -101,61 +99,10 @@ function remove(ItemModel: any) {
     }
 }
 
-function fnLogin(User: Model<IUser>) {
-    return async (req: Request & IAuth, callback: Function) => {
-        console.log("\tUSER_LOGIN");
-
-        const user = await User.findOne({ 'cpf': req.body.cpf }).select('+password');
-        autentication(req.body, <IUser>user, callback)
-    }
-
-    async function autentication(reqData: IUser, user: IUser, callback: Function) {
-        if (!user)
-            callback(MSG.errUserAbsent)
-        else {
-            //se a senha estiver correta
-            if (Auth.decodePassword(reqData.dataAccess.password, user.dataAccess.password)) {
-                // if (reqData.password == user.dataAccess.password) {
-                //gerar um token para a conexao
-                // user.loginInfo.token = Auth.generateToken(user.email);
-                user.loginInfo.token = await Auth.generateToken({
-                    'date': Date.now(),
-                    '_id': user._id,
-                    'profile': Auth.generateToken(user.profiles ?? 'Registrado')
-                });
-                userLoginInfoUpdate(user, callback);
-            }
-            else {
-                callback(MSG.errPass);
-            }
-        }
-    }
-
-    function userLoginInfoUpdate(user: any, callback: Function) {
-        //salva/atualiza o token no usuario db
-        // Item.findOneAndUpdate({ '_id': user._id }, user, { upsert: true }, (error) => {
-        //     (error) ? callback(MSG.errLogin) : callback(user.loginInfo.token);
-        // });
-
-        const query = User.updateOne({ '_id': user._id }, user);
-        // callback(query) //! trocar
-        User.updateOne({ '_id': user._id }, user, (error) => {
-            if (error) {
-                console.log("USER_LOGIN_ERROR: " + error);
-                callback(MSG.errLogin);
-            }
-            else {
-                delete user.password;
-                callback(user);
-            }
-        });
-    }
-}
-
 function fnCounter(User: Model<IUser>) {
     return (req: Request & IAuth, callback: Function) => {
         User.countDocuments(req.body).exec((error, data) => {
-            (error || !data) ? callback(MSG.errConn) : callback(data)
+            (error || !!data) ? console.log(MSG.errConn) : callback(data)
         });
     }
 }
