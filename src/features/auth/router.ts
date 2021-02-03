@@ -1,14 +1,12 @@
 import express, { NextFunction, Request, Response } from 'express';
 import Auth, { IAuth } from './../../authServices';
 import { IUser } from './../../models/User';
-import controller, { IUserCtrl } from './controller';
+import controller, { IAuthCtrl } from './controller';
 
 var router = express.Router();
 
 export default function (itemName: string) {
-    var itemCtrl = controller(itemName);
-
-    const ALLOWS = ['SuperUser', 'Administrador', 'Técnicos']
+    var itemCtrl = controller();
 
     router.post('/login', fnLogIn(itemCtrl));
     router.post('/logout', Auth.isAuthorized, fnLogOut(itemCtrl));
@@ -18,26 +16,26 @@ export default function (itemName: string) {
     return router;
 }
 
-function fnLogIn(itemCtrl: IUserCtrl) {
+function fnLogIn(itemCtrl: any) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
         itemCtrl.login(req, (resp: IUser) => { res.json(resp) });
     };
 }
 
-function fnLogOut(itemCtrl: IUserCtrl) {
+function fnLogOut(itemCtrl: any) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.login(req, (resp: IUser) => { res.json(resp) });
+        itemCtrl.logout(req, (resp: IUser) => { res.json(resp) });
     };
 }
 
-function fnLogOn(itemCtrl: IUserCtrl) {
+function fnLogOn(itemCtrl: any) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.login(req, (resp: IUser) => { res.json(resp) });
+        itemCtrl.logon(req, (resp: IUser) => { res.json(resp) });
     };
 }
 
-function fnLogOff(itemCtrl: IUserCtrl) {
+function fnLogOff(itemCtrl: any) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.login(req, (resp: IUser) => { res.json(resp) });
+        itemCtrl.logoff(req, (resp: IUser) => { res.json(resp) });
     };
 }
