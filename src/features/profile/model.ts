@@ -1,6 +1,6 @@
-// import { IInstrument, obj } from "./IInstrument";
+// import { IProfile, obj } from "./IProfile";
 
-// export default function (itemName: string): IInstrument {
+// export default function (itemName: string): IProfile {
 //     const DB = require('../../db/dbConnect');
 //     const Schema = DB.Mongoose.Schema;
 //     const ObjectId = Schema.Types.ObjectId;
@@ -15,12 +15,12 @@
 // }
 
 
-import { IInstrument, Instrument } from "./../instrument/IInstrument";
+import { IProfile, Profile } from "./../../models/Profile";
 import DB from "../../db/dbConnect";
 import { Model } from "mongoose";
 
 // export default function (itemName: string): Model<Document, {}> {
-export default function (itemName: string): Model<IInstrument> {
-    const itemSchema = new DB.Schema(Instrument, { collection: itemName });
-    return DB.model<IInstrument>(itemName, itemSchema, itemName);
+export default function (itemName: string): Model<IProfile> {
+    const itemSchema = new DB.Schema(Profile, { collection: itemName });
+    return DB.model<IProfile>(itemName, itemSchema, itemName);
 }
