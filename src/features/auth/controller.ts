@@ -35,29 +35,28 @@ function fnLogIn(User: Model<IUser>) {
     async function autentication(req: Request, user: IUser, callback: Function) {
         if (!user) {
             callback(MSG.errUserAbsent)
+            return;
+        }
+        //se a senha estiver correta
+        // if (Auth.compareHash(req.body.dataAccess.password, user.dataAccess.password)) { //! REMOVER ESTE
+        if (Auth.compareHash(req.body.dataAccess.password, user.dataAccess.passwordHash)) { //? USAR ESTE
+
+            const ipClient = req.connection.remoteAddress || req.socket.remoteAddress;
+
+            user.loginInfo.token = await Auth.generateToken({
+                'date': new Date(),
+                // 'date': Date.now(),
+                '_id': user._id,
+                'ipClient': await Auth.encodeTextAES(ipClient),
+                'profile': user.dataAccess.profiles[0] ?? 'Administrador', //! REMOVER ESTE
+                // 'profile': user.dataAccess.profiles ?? 'Registrado' //? USAR ESTE
+                'profiles': await Auth.encodeTextAES(JSON.stringify(user.dataAccess.profiles) ?? 'Registrado')
+            });
+            user.loginInfo.lastDate = new Date();
+            userLoginInfoUpdate(user, callback);
         }
         else {
-            //se a senha estiver correta
-            if (Auth.decodePassword(req.body.dataAccess.password, user.dataAccess.password)) {
-                // if (Auth.decodePassword(req.body.dataAccess.password, user.dataAccess.passwordHash)) {
-                // if (req.body.password == user.dataAccess.password) {
-                    // const ipCliente = req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
-                    const ipClient = req.connection.remoteAddress || req.socket.remoteAddress;
-                //gerar um token para a conexao
-                // user.loginInfo.token = Auth.generateToken(user.email);
-                user.loginInfo.token = await Auth.generateToken({
-                    'date': Date.now(),
-                    '_id': user._id,
-                    'ipClient': ipClient,
-                    'profile': user.profiles ?? 'Administrador' //! REMOVER ESTE
-                    // 'profile': user.profiles ?? 'Registrado' //? USAR ESTE
-                    // 'profile': await Auth.generateToken(user.profiles ?? 'Registrado')
-                });
-                userLoginInfoUpdate(user, callback);
-            }
-            else {
-                callback(MSG.errPass);
-            }
+            callback(MSG.errPass);
         }
     }
 
