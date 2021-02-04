@@ -41,7 +41,7 @@ app.use(function timeLog(req, res, next) {
 
 require('./appFeatures')(app);
 
-require('./appINI')(app);
+require('./appIni')(app);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
