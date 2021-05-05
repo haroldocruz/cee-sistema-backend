@@ -6,36 +6,49 @@ import controller, { IAuthCtrl } from './controller';
 var router = express.Router();
 
 export default function (itemName: string) {
-    var itemCtrl = controller();
+    var itemCtrl: IAuthCtrl = controller();
 
-    router.post('/login', fnLogIn(itemCtrl));
-    router.post('/logout', Auth.isAuthorized, fnLogOut(itemCtrl));
-    router.post('/logon', Auth.isAuthorized, fnLogOn(itemCtrl));
-    router.post('/logoff', Auth.isAuthorized, fnLogOff(itemCtrl));
+    router.post('/login', fnLogIn(itemCtrl['login']));
+    router.post('/logout/:id', Auth.isAuthorized, fnHandler(itemCtrl['logout']));
+    router.post('/logon/:id', Auth.isAuthorized, fnLogOn(itemCtrl['logon']));
+    router.post('/logoff/:id', Auth.isAuthorized, fnLogOff(itemCtrl['logoff']));
 
     return router;
 }
 
-function fnLogIn(itemCtrl: any) {
+function response(res: Response): Function {
+    return (data: IUser | Array<any>) => { 
+        // if(typeof data[0] === "boolean")
+        res.status(200).json(data)
+    }
+}
+
+function fnHandler(handle: Function) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.login(req, (resp: IUser) => { res.json(resp) });
+        handle(req, response(res));
     };
 }
 
-function fnLogOut(itemCtrl: any) {
+function fnLogIn(login: IAuthCtrl['login']) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.logout(req, (resp: IUser) => { res.json(resp) });
+        login(req, response(res));
     };
 }
 
-function fnLogOn(itemCtrl: any) {
+function fnLogOut(logout: IAuthCtrl['logout']) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.logon(req, (resp: IUser) => { res.json(resp) });
+        logout(req, (resp: IUser) => { res.json(resp) });
     };
 }
 
-function fnLogOff(itemCtrl: any) {
+function fnLogOn(logon: IAuthCtrl['logon']) {
     return (req: Request & IAuth, res: Response, next: NextFunction) => {
-        itemCtrl.logoff(req, (resp: IUser) => { res.json(resp) });
+        logon(req, (resp: IUser) => { res.json(resp) });
+    };
+}
+
+function fnLogOff(logoff: IAuthCtrl['logoff']) {
+    return (req: Request & IAuth, res: Response, next: NextFunction) => {
+        logoff(req, (resp: IUser) => { res.json(resp) });
     };
 }

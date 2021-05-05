@@ -1,32 +1,36 @@
-'use strict'
+
+export interface IMessage {
+    statusCode: number;
+    statusMessage: string;
+}
 
 //CONNECTION
-export const errConn = [false, 'Erro ao tentar conectar'];
+export const errConn = { statusCode: 502, statusMessage: 'Erro ao tentar conectar'};
 //LOGIN
-export const errUserAbsent = [false, 'Usuário não cadastrado'];
-export const errPass = [false, 'Senha inválida'];
-export const errLogin = [false, 'Erro ao tentar fazer login'];
-export const errLowLevel = [false, "Necessário elevar seu nível de acesso para realizar esta ação"];
-export const errNoAuth = [false, "Somente usuários autenticados podem realizar esta ação"];
+export const errUserAbsent = { statusCode: 406, statusMessage: 'Usuário não cadastrado'};
+export const errPass = { statusCode: 406, statusMessage: 'Senha inválida'};
+export const errLogin = { statusCode: 400, statusMessage: 'Erro ao tentar fazer login'};
+export const errLowLevel = { statusCode: 403, statusMessage: "Necessário elevar seu nível de acesso para realizar esta ação"};
+export const errNoAuth = { statusCode: 401, statusMessage: "Somente usuários autenticados podem realizar esta ação"};
 //CONNECT
-export const errTokenOrUser = [false, 'Problema com seu token ou usuário'];
-export const errToken = [false, 'Token inválido'];
-export const errNoToken = [false, 'Acesso restrito'];
+export const errTokenOrUser = { statusCode: 400, statusMessage: 'Problema com seu token ou usuário'};
+export const errToken = { statusCode: 400, statusMessage: 'Token inválido'};
+export const errNoToken = { statusCode: 401, statusMessage: 'Acesso restrito'};
 //CREATE
-export const errMailExist = [false, 'Email já cadastrado'];
-export const errSave = [false, 'Erro ao tentar salvar'];
+export const errMailExist = { statusCode: 400, statusMessage: 'Email já cadastrado'};
+export const errSave = { statusCode: 400, statusMessage: 'Erro ao tentar salvar'};
 //READ
-export const errFind = [false, 'Nenhum dado encontrado'];
+export const errFind = { statusCode: 204, statusMessage: 'Nenhum dado encontrado'};
 //UPDATE
-export const errUpd = [false, 'Erro ao tentar atualizar'];
+export const errUpd = { statusCode: 400, statusMessage: 'Erro ao tentar atualizar'};
+export const errUpdVoid = { statusCode: 400, statusMessage: 'Nada foi modificado'};
 //DELETE
-export const errRem = [false, 'Erro ao tentar remover'];
-export const errRemNotFound = [false, 'Erro ao tentar remover. Dado não localizado'];
+export const errRem = { statusCode: 400, statusMessage: 'Erro ao tentar remover'};
 //OTHERS
-export const errDenied = [false, 'Permissão negada'];
-export const errNoData = [false, 'Nenhum dado enviado'];
-export const errNoPermission = [false, 'Usuário não autorizado a realizar esta operação'];
-export const msgSuccess = [true, 'Sucesso']
+export const errDenied = { statusCode: 403, statusMessage: 'Permissão negada'};
+export const errNoData = { statusCode: 204, statusMessage: 'Nenhum dado enviado'};
+export const errNoPermission = { statusCode: 403, statusMessage: 'Usuário não autorizado a realizar esta operação'};
+export const msgSuccess = { statusCode: 200, statusMessage: 'Ação realizada com sucesso'}
 
 // export default {
 //     //CONNECTION

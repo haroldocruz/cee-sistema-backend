@@ -1,36 +1,35 @@
-import { IGroup } from './Group';
 import { Document, Schema, Model } from "mongoose";
+import { IProfile } from "./Profile";
 
 export enum GenderEnum {
-    MALE = "Masculino",
-    FEMALE = "Feminino",
+    FEMININO = "Feminino",
+    MASCULINO = "Masculino",
     UNINFORMED = "Não informado",
 }
 
 export enum MaritalStatusEnum {
-    SINGLE = "Solteiro(a)",
-    MARIED = "Casado(a)",
-    DIVORCED = "Divorciado(a)",
-    WIDOWER = "Viúvo(a)",
+    SOLTEIRO = "Solteiro(a)",
+    CASADO = "Casado(a)",
+    DIVORCIADO = "Divorciado(a)",
+    VIUVO = "Viúvo(a)",
 }
 
-// export interface IRg {
-//     "number": number;
-//     "expeditionDate": Date;
-//     "dispatcherAgency": string;
-//     "uf": string;
-// }
+export interface IRg {
+    "number": number;
+    "expeditionDate": Date;
+    "dispatcherAgency": string;
+    "uf": string;
+}
 
 export interface IContact {
-    "emailList": [IEMail];
-    "phoneList": [IPhone];
-    "addressList": [IAddress];
+    "email": [IEMail];
+    "phone": [IPhone];
+    "address": [IAddress];
 }
 
 export interface IPhone {
     "number": number;
-    "description": string;
-    // "typePhone": TypePhoneEnum;
+    "typePhone": TypePhoneEnum;
 }
 
 export interface IEMail {
@@ -38,14 +37,14 @@ export interface IEMail {
     "description": string;
 }
 
-// export enum TypePhoneEnum {
-//     CELULAR = "Celular",
-//     RESIDENCIAL = "Residencial",
-//     TRABALHO = "Trabalho",
-//     RURAL = "Rural",
-//     COMERCIAL = "Comercial",
-//     RECADO = "Recado"
-// }
+export enum TypePhoneEnum {
+    CELULAR = "Celular",
+    RESIDENCIAL = "Residencial",
+    TRABALHO = "Trabalho",
+    RURAL = "Rural",
+    COMERCIAL = "Comercial",
+    RECADO = "Recado"
+}
 
 export interface IAddress {
     "country": string;
@@ -56,14 +55,10 @@ export interface IAddress {
     "number": number;
     "zipcode": number;
     "complement": string;
-    "description": string;
 }
 
 export interface ILoginInfo {
     'lastDate'?: Date;
-    'actualDate'?: Date;
-    'ipClient'?: string;
-    "group"?: IGroup;
     "token"?: string;
     "providerId"?: string;
     "providerKey"?: string;
@@ -73,23 +68,23 @@ export interface IDataAccess {
     "username"?: string;
     "password": string;
     "passwordHash": string;
-    "groupDefault": IGroup;
-    "groupList"?: [IGroup];
+    "group": IProfile;
+    "groups"?: [IProfile];
+    "groupsCrypt"?: string;
 }
 
 export interface IUserBase {
-    'status': boolean;
-    // 'status': string;
+    // 'status': boolean;
+    'status': string;
     'name': string;
     'cpf': string;
-    // 'rg': IRg;
-    'gender': string;
-    // 'maritalStatus': string;
-    'birthDate': Date;
+    'rg': IRg;
     'contact': IContact;
+    'maritalStatus': string;
+    'gender': string;
     'dataAccess': IDataAccess;
+    'birthDate': Date;
     'loginInfo'?: ILoginInfo;
-    'description': string;
     'metadata': Schema.Types.ObjectId;
 }
 
@@ -97,58 +92,56 @@ export interface IUser extends IUserBase, Document { }
 export interface IUser2 extends Model<Document> { }
 
 export const User = {
-    'status': { type: Boolean, default: false },
-    // 'status': { type: String, default: "Inativo" },
+    // 'status': { type: Boolean, default: false },
+    'status': { type: String, default: "Inativo" },
     'name': { type: String },
     'cpf': { type: String },
-    // 'rg': {
-    //     'number': { type: Number },
-    //     'expeditionDate': { type: Date },
-    //     'dispatcherAgency': { type: String },
-    //     'uf': String
-    // },
-    'gender': String,
-    // 'maritalStatus': String,
-    'birthDate': Date,
+    'rg': {
+        'number': { type: Number },
+        'expeditionDate': { type: Date },
+        'dispatcherAgency': { type: String },
+        'uf': String
+    },
     'contact': {
-        "emailList": [ {
+        "email": [ {
             "address": String, 
             "description": String
         }],
-        "phoneList": [{
+        "phone": [{
             "number": Number,
-            "description": String
+            "typePhone": String
         }],
-        "addressList": [{
+        "address": [{
             "country": String,
             "state": String,
             "city": String,
-            "district": String, //bairro
-            "place": String, //logradouro
+            "district": String,
+            "place": String,
             "number": Number,
             "zipcode": Number,
-            "complement": String,
-            "description": String
+            "complement": String
         }]
     },
+    'maritalStatus': String,
+    'gender': String,
     'dataAccess': {
         'username': String,
         'password': { type: String, select: false },
         'passwordHash': { type: String, select: false }, //encrypted
-        'groupList': [{ type: Schema.Types.ObjectId, ref: "group", select: false }],
+        // 'groups': [{ type: Schema.Types.ObjectId, ref: "profile" }],
+        'group': Number,
+        'groups': [{ type: String, select: false }], //encrypted
+        'groupsCrypt': { type: String, select: false }, //encrypted
     },
+    'birthDate': Date,
     'loginInfo': {
         'lastDate': Date,
-        'actualDate': Date,
-        'ipClient': String,
         'token': String,
-        'group': { type: Schema.Types.ObjectId, ref: "group" },
         'providerId': String,
         'providerKey': String,
     },
-    'description': String,
 
-    'metadata': { type: Schema.Types.ObjectId, ref: 'metadata', select: false }
+    'metadata': { type: Schema.Types.ObjectId, ref: 'metadata' }
 }
 
 

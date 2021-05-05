@@ -10,11 +10,12 @@
     "dev:ts": "ts-node-dev --respawn --transpile-only --clear --ignore-watch node_modules ./src/bin/www"
   },
   "dependencies": {
+    "@types/crypto-js": "^4.0.1",
     "bcrypt": "^5.0.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.19.0",
     "cookie-parser": "~1.4.5",
-    "crypto": "^1.0.1",
+    "crypto-js": "^4.0.0",
     "debug": "~4.3.1",
     "dotenv": "^8.2.0",
     "ejs": "~3.1.5",

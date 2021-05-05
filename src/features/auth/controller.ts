@@ -1,15 +1,15 @@
-import { Model, Document, model } from "mongoose";
+import { Model, model } from "mongoose";
 import { Request } from "express";
 import { IUser } from './../../models/User';
 import * as MSG from '../../utils/messages';
-import Auth, { IAuth } from "../../authServices";
-const util = require('../../utils/util');
+import { IAuth } from "../../authServices";
+import Crypt from "./../../utils/security/cryptograph";
 
 export interface IAuthCtrl {
-    'login': (arg0: Request & IAuth, callback: any) => any;
-    'logout': (arg0: Request & IAuth, callback: any) => any;
-    'logon': (arg0: Request & IAuth, callback: any) => any;
-    'logoff': (arg0: Request & IAuth, callback: any) => any;
+    'login': (arg0: Request & IAuth, callback: Function) => void;
+    'logout': (arg0: Request & IAuth, callback: Function) => void;
+    'logon': (arg0: Request & IAuth, callback: Function) => void;
+    'logoff': (arg0: Request & IAuth, callback: Function) => void;
 }
 
 export default function () {
@@ -26,55 +26,77 @@ export default function () {
 
 function fnLogIn(User: Model<IUser>) {
     return async (req: Request & IAuth, callback: Function) => {
-        console.info("\tUSER_LOGIN");
+        console.info("\tUSER_LOGIN", req.body);
 
-        const user = await User.findOne({ 'cpf': req.body.cpf }).select('+password');
-        autentication(req, <IUser>user, callback)
+        //TODO: verificar se o username da requisição é 'email' ou 'cpf'
+        try {
+            //buscar usuário no DB pelo 'email' ou 'cpf'
+            const user = await User.findOne({ 'cpf': req.body.username }).select('+dataAccess.passwordHash +dataAccess.groupList +dataAccess.groupDefault');
+
+            //verificar autenticidade do usuário
+            autentication(req, <IUser>user, callback)
+
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async function autentication(req: Request, user: IUser, callback: Function) {
-        if (!user) {
-            callback(MSG.errUserAbsent)
-            return;
-        }
-        //se a senha estiver correta
-        // if (Auth.compareHash(req.body.dataAccess.password, user.dataAccess.password)) { //! REMOVER ESTE
-        if (Auth.compareHash(req.body.dataAccess.password, user.dataAccess.passwordHash)) { //? USAR ESTE
 
+        //verificar se retornou algum usuário do DB
+        if (!user) { callback(MSG.errUserAbsent); return; }
+        //verificar se usuário possui senha guardada no DB
+        if (!user.dataAccess.passwordHash) { callback(MSG.errPass); return; }
+
+        //verificar se a senha enviada é diferente da senha salva criptografada no DB
+        if (await Crypt.compareHash(req.body.password, user.dataAccess.passwordHash)) {
+
+            //verifica qual é o perfil padrão
+            // const group = user.dataAccess.groupList.find(function (group){ user.dataAccess.groupDefault == group });
+            const group = user.dataAccess.groupDefault;
+
+            //pegar o ip do cliente que fez a conexão
             const ipClient = req.connection.remoteAddress || req.socket.remoteAddress;
 
-            user.loginInfo.token = await Auth.generateToken({
-                'date': new Date(),
-                // 'date': Date.now(),
-                '_id': user._id,
-                'ipClient': await Auth.encodeTextAES(ipClient),
-                'profile': user.dataAccess.profiles[0] ?? 'Administrador', //! REMOVER ESTE
-                // 'profile': user.dataAccess.profiles ?? 'Registrado' //? USAR ESTE
-                'profiles': await Auth.encodeTextAES(JSON.stringify(user.dataAccess.profiles) ?? 'Registrado')
+            //pegar o momento atual (data)
+            const actualDate = new Date();
+
+            //gerar um token baseado em:
+            // -momento atual;
+            // -id do usuário;
+            // -ip do cliente (deverá ser criptografado);
+            // -grupo/perfil atual do usuário;
+            // -lista dos grupos/perfis a qual o usuário pertence (deverá ser criptografado)
+            const token = await Crypt.generateToken({
+                'date': actualDate,
+                'id': user._id,
+                'ipClient': await Crypt.encodeTextAES(ipClient),
+                'group': group,
+                'groupList': (user.dataAccess.groupList) ? await Crypt.encodeTextAES(JSON.stringify(user.dataAccess.groupList)) : null
             });
-            user.loginInfo.lastDate = new Date();
+
+            //atualizar informações de login
+            user.loginInfo.lastDate = user.loginInfo.actualDate;
+            user.loginInfo.actualDate = actualDate;
+            user.loginInfo.ipClient = ipClient;
+            user.loginInfo.group = group;
+            user.loginInfo.token = token;
+
+            //guardar as novas informações de login no DB
             userLoginInfoUpdate(user, callback);
-        }
-        else {
+        } else {
             callback(MSG.errPass);
         }
     }
 
-    async function userLoginInfoUpdate(user: any, callback: Function) {
-        //salva/atualiza o token no usuario db
-        // Item.findOneAndUpdate({ '_id': user._id }, user, { upsert: true }, (error) => {
-        //     (error) ? callback(MSG.errLogin) : callback(user.loginInfo.token);
-        // });
-
-        // const query = await User.updateOne({ '_id': user._id }, user);
-        // callback(query) //! trocar
-        User.updateOne({ '_id': user._id }, user, (error) => {
+    async function userLoginInfoUpdate(user: IUser, callback: Function) {
+        console.log(user) //!APAGAR
+        User.updateOne({ '_id': user._id }, { $set: user }, {}, (error) => {
             if (error) {
                 console.log("USER_LOGIN_ERROR: " + error);
                 callback(MSG.errLogin);
             }
             else {
-                delete user.password;
                 callback(user);
             }
         });
@@ -83,16 +105,25 @@ function fnLogIn(User: Model<IUser>) {
 
 function fnLogOut(User: Model<IUser>) {
     return async (req: Request & IAuth, callback: Function) => {
-        const loginInfo = { 'loginInfo': { 'token': '' } };
-        const update = await User.updateOne({ '_id': req.userId, 'loginInfo': { 'token': req.body.token } }, loginInfo);
+
+        const loginInfo = { 'loginInfo': undefined };
+        const find = { '_id': req.userId, 'loginInfo.token': req.body.token }
+
+        const update = await User.updateOne(find, loginInfo);
+
         if (update.nModified === 0) {
             callback(MSG.errFind);
             return;
         }
+
         callback(MSG.msgSuccess);
     }
 }
 
-function fnLogOn(User: Model<IUser>) { }
+function fnLogOn(User: Model<IUser>) {
+    return async (req: Request & IAuth, callback: Function) => { }
+}
 
-function fnLogOff(User: Model<IUser>) { }
+function fnLogOff(User: Model<IUser>) {
+    return async (req: Request & IAuth, callback: Function) => { }
+}

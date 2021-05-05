@@ -22,6 +22,7 @@ module.exports = function (app) {
   // app.use('/estrategia', require('./features/estrategia'));
   // app.use('/acao', require('./features/acao'));
   
+  app.use('/group', require('./features/group'));
   app.use('/user', require('./features/user'));
   app.use('/auth', require('./features/auth'));
   app.use('/send-mail', require('./features/send-mail'));

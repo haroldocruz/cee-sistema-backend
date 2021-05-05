@@ -13,8 +13,10 @@ const local = {
 
 const docker = {
     protocol: 'mongodb://',
-    user: 'admin',
-    password: ':' + 'GE0xJoamuF4y' + '@',
+    // user: 'admin',
+    // password: ':' + 'GE0xJoamuF4y' + '@',
+    user: '',
+    password: '',
     address: 'cee-sistema-data',
     port: ':' + '27017',
     dbName: '/' + 'ceesistema',

@@ -4,17 +4,8 @@ import { ModelNameEnum } from './enumerations/ModelNameEnum';
 export interface IProfile extends Document {
     "status": boolean;
     "name": string;
-    "roleCrud"?: IRoleCrud[];
     "description": string;
-}
-
-interface IRoleCrud {
-    "_modelName": ModelNameEnum;
-    "_model": { type: Schema.Types.ObjectId, refPath: "_modelName" };
-    "C"?: boolean;
-    "R"?: boolean;
-    "U"?: boolean;
-    "D"?: boolean;
+    // "roleCrud"?: IRoleCrud[];
 }
 
 export const Profile = {

@@ -1,4 +1,4 @@
-import { Model, Document } from "mongoose";
+import { Model, Document, CastError } from "mongoose";
 import { DeleteWriteOpResultObject } from "mongodb";
 import { Request } from "express";
 import { IUser } from './../../models/User';
@@ -58,18 +58,20 @@ function getAll(ItemModel: Model<IUser>) {
         console.log("\tUSER_READ_ALL\n")
 
         ItemModel.find({}, (error: any, resp: any) => { (error || !resp) ? callback(MSG.errFind) : callback(resp) })
-            // .populate({ path: '_indicator', populate: { path: '_critery' } })
-            // .select('order description')
+            .populate({ path: 'dataAccess.groupList' })
+            // .select('groups')
             .sort('order')
     }
 }
 
-function save(ItemModel: any) {
-    return async (req: any, callback: Function) => {
+function save(ItemModel: Model<IUser>) {
+    return async (req: Request, callback: Function) => {
         console.log("\tUSER_CREATE\n")
 
         var newItem = new ItemModel(req.body);
-        await newItem.save(function (error: any) { (error) ? callback(MSG.errSave) : callback(MSG.msgSuccess) });
+        await newItem.save(function (error: CastError) {
+            (error) ? (() => { callback(MSG.errSave); console.log(error) })() : callback(MSG.msgSuccess)
+        });
 
     }
 }
@@ -80,8 +82,8 @@ function update(ItemModel: Model<IUser>) {
 
         const id = req.body._id || req.params.id;
         await ItemModel.updateOne({ '_id': id }, req.body, {}, (error: any, data: any) => {
-            console.log(data);
-            (error) ? callback(MSG.errUpd) : (data.nModified) ? callback(MSG.msgSuccess) : callback(MSG.errUpd)
+            // console.log(data);
+            (error) ? (() => { callback(MSG.errUpd); console.log(error) })() : (data.nModified) ? callback(MSG.msgSuccess) : callback(MSG.errUpdVoid)
         });
 
         // metadata.update(req.metadata, req.userId);
@@ -94,7 +96,7 @@ function remove(ItemModel: any) {
         console.log("\tUSER_DELETE\n")
 
         await ItemModel.deleteOne({ '_id': req.params.id }, function (error: any, data: DeleteWriteOpResultObject) {
-            (error) ? callback(MSG.errRem) : (data.deletedCount == 0) ? callback(MSG.errRemNotFound) : callback(MSG.msgSuccess);
+            (error) ? callback(MSG.errRem) : (data.deletedCount == 0) ? callback(MSG.errFind) : callback(MSG.msgSuccess);
         });
     }
 }

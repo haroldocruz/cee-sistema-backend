@@ -6,6 +6,7 @@ module.exports = [
   { 'active': true, 'role': 'Access-Control-Allow-Methods', 'value': 'GET, POST, OPTIONS, PUT, PATCH, DELETE' },
   // Request headers you wish to allow
   { 'active': true, 'role': 'Access-Control-Allow-Headers', 'value': 'X-Requested-With, content-type, x-access-token, Authorization' },
+  // { 'active': true, 'role': 'Access-Control-Allow-Headers', 'value': '*' },
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
   { 'active': true, 'role': 'Access-Control-Allow-Credentials', 'value': true },
