@@ -1,5 +1,6 @@
-import { IGroup } from './Group';
-import { Document, Schema, Model } from "mongoose";
+import { Document, Model, Schema } from "mongoose";
+import { IContact } from './Contact';
+import { IProfile } from './Profile';
 
 export enum GenderEnum {
     MALE = "Masculino",
@@ -21,23 +22,6 @@ export enum MaritalStatusEnum {
 //     "uf": string;
 // }
 
-export interface IContact {
-    "emailList": [IEMail];
-    "phoneList": [IPhone];
-    "addressList": [IAddress];
-}
-
-export interface IPhone {
-    "number": number;
-    "description": string;
-    // "typePhone": TypePhoneEnum;
-}
-
-export interface IEMail {
-    "address": string;
-    "description": string;
-}
-
 // export enum TypePhoneEnum {
 //     CELULAR = "Celular",
 //     RESIDENCIAL = "Residencial",
@@ -47,23 +31,11 @@ export interface IEMail {
 //     RECADO = "Recado"
 // }
 
-export interface IAddress {
-    "country": string;
-    "state": string;
-    "city": string;
-    "district": string;
-    "place": string;
-    "number": number;
-    "zipcode": number;
-    "complement": string;
-    "description": string;
-}
-
 export interface ILoginInfo {
     'lastDate'?: Date;
     'actualDate'?: Date;
     'ipClient'?: string;
-    "group"?: IGroup;
+    "profileLogin"?: IProfile;
     "token"?: string;
     "providerId"?: string;
     "providerKey"?: string;
@@ -73,15 +45,15 @@ export interface IDataAccess {
     "username"?: string;
     "password": string;
     "passwordHash": string;
-    "groupDefault": IGroup;
-    "groupList"?: [IGroup];
+    "profileDefault": IProfile;
+    "profileList"?: [IProfile];
 }
 
 export interface IUserBase {
     'status': boolean;
     // 'status': string;
     'name': string;
-    'cpf': string;
+    'cpf': number;
     // 'rg': IRg;
     'gender': string;
     // 'maritalStatus': string;
@@ -100,7 +72,7 @@ export const User = {
     'status': { type: Boolean, default: false },
     // 'status': { type: String, default: "Inativo" },
     'name': { type: String },
-    'cpf': { type: String },
+    'cpf': { type: Number },
     // 'rg': {
     //     'number': { type: Number },
     //     'expeditionDate': { type: Date },
@@ -111,8 +83,8 @@ export const User = {
     // 'maritalStatus': String,
     'birthDate': Date,
     'contact': {
-        "emailList": [ {
-            "address": String, 
+        "emailList": [{
+            "address": String,
             "description": String
         }],
         "phoneList": [{
@@ -135,14 +107,15 @@ export const User = {
         'username': String,
         'password': { type: String, select: false },
         'passwordHash': { type: String, select: false }, //encrypted
-        'groupList': [{ type: Schema.Types.ObjectId, ref: "group", select: false }],
+        'profileDefault': { type: Schema.Types.ObjectId, ref: "profile" },
+        'profileList': [{ type: Schema.Types.ObjectId, ref: "profile", select: false }],
     },
     'loginInfo': {
         'lastDate': Date,
         'actualDate': Date,
         'ipClient': String,
         'token': String,
-        'group': { type: Schema.Types.ObjectId, ref: "group" },
+        'profileLogin': { type: Schema.Types.ObjectId, ref: "profile" },
         'providerId': String,
         'providerKey': String,
     },
@@ -164,8 +137,8 @@ export const User = {
 //         'username': string;
 //         'password': string;
 //         'passwordHash': string; //encrypted
-//         'groups': [string]; //encrypted
-//         'groupsCrypt': string; //encrypted
+//         'profiles': [string]; //encrypted
+//         'profilesCrypt': string; //encrypted
 //     };
 //     'birthDate': string;
 //     'address': [IAddress];
