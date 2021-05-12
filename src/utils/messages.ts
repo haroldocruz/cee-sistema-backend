@@ -1,5 +1,5 @@
 
-export interface IMessage {
+export interface IStatusMessage {
     statusCode: number;
     statusMessage: string;
 }
@@ -7,7 +7,9 @@ export interface IMessage {
 //CONNECTION
 export const errConn = { statusCode: 502, statusMessage: 'Erro ao tentar conectar'};
 //LOGIN
+export const errUsername = { statusCode: 406, statusMessage: 'Email ou CPF inválido'};
 export const errUserAbsent = { statusCode: 406, statusMessage: 'Usuário não cadastrado'};
+export const errUserDeactived = { statusCode: 406, statusMessage: 'Usuário desativado. Por favor, entre em contato com a administração'};
 export const errPass = { statusCode: 406, statusMessage: 'Senha inválida'};
 export const errLogin = { statusCode: 400, statusMessage: 'Erro ao tentar fazer login'};
 export const errLowLevel = { statusCode: 403, statusMessage: "Necessário elevar seu nível de acesso para realizar esta ação"};
